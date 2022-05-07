@@ -1,0 +1,35 @@
+html
+{
+    height: 99.5%;
+    width: 99.5%;
+    overflow:  hidden;
+    margin: 0;
+}
+
+body
+{
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    background: rgb(4, 102, 97);
+    color: rgb(116, 189, 183);
+    font-size: x-large;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.input-menu
+{
+    height: 98%;
+    width: 25%;
+    border-right: 3px solid rgb(116, 189, 183);
+}
+
+.result
+{
+    height: 98%;
+    width: 70%;
+    border-left: 3px solid rgb(116, 189, 183);
+}
