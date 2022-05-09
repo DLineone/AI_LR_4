@@ -12,28 +12,49 @@
     <div class="input-menu">
         <div class="input-div">
             <p>X начальное:</p>
-            <input type="text" class="input-x-start">
+            <input type="number" class="input-x-start">
         </div>
         <div class="input-div">
             <p>X конечное:</p>
-            <input type="text" class="input-x-end">
+            <input type="number" class="input-x-end" required>
         </div>
         <div class="input-div">
             <p>Порядок точности:</p>
-            <input type="text" class="input-accuracy">
+            <input type="number" class="input-accuracy" required min="0" max="20" step="1" value="2">
         </div>
         <div class="input-div">
             <p>Размер популяции:</p>
-            <input type="text" class="input-population-size">
+            <input type="number" class="input-population-size" required min="10" max="500" step="10">
+        </div>
+        <div class="input-div">
+            <p>Кол-во итераций:</p>
+            <input type="number" class="input-iteration-number" required min="10" max="500" step="10">
         </div>
         <div class="input-div">
             <p>Размер хромосомы:</p>
             <p class="output-chromosome-size"></p>
         </div>
-        
+        <div class="input-div">
+            <button class="submit-variables">Ввести данные!</button>
+        </div>
+        <div class="input-div button-div" style="visibility: hidden;">
+            <button class="step-forvard-button">Сделать шаг</button>
+            <button class="result-btton">Показать результат</button>
+        </div>
     </div>
     <div class="result">
+        <p class="result-header">Результат</p>
+        <div class="result-content">
 
+        </div>
     </div>
+
+    <!-- <datalist id="defaultNumbers">
+        <option value="10045678">
+        <option value="103421">
+        <option value="11111111">
+        <option value="12345678">
+        <option value="12999922">
+    </datalist> -->
 </body>
 </html>
