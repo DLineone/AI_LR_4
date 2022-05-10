@@ -30,29 +30,17 @@ const getRandom = (min, max) => Math.random() * (max - min) + min;
 
 const choseParents = (copyMas, populationSize, sum) =>
 {
-    let copyPopulationSize = populationSize;
     let parent1, parent2;
-    copyMas = copyMas.map((value, index) => [index, value]);
+    let idMas = copyMas.map((value, index) => index);
+
     let chance = Math.random() * sum;
-    for(let i = 0; i < copyPopulationSize; i++)
-    {
-        if(chance <= copyMas[i][1])
-        {
-            parent1 = copyMas[i][0];
-            copyMas.splice(i, 1);
-            copyPopulationSize--;
-            break;
-        }
-    }
+    parent1 = idMas[copyMas.findIndex((value) => chance <= value)];
+    copyMas.splice(parent1, 1);
+    idMas.splice(parent1, 1);
+
     chance = Math.random() * sum;
-    for(let i = 0; i < copyPopulationSize; i++)
-    {
-        if(chance <= copyMas[i][1])
-        {
-            parent2 = copyMas[i][0];
-            break;
-        }
-    }
+    parent2 = idMas[copyMas.findIndex((value) => chance <= value)];
+    debugger
     return [parent1, parent2];
 }
 
@@ -149,15 +137,14 @@ function StartPopulation()
 step_forvard_button.onclick = crosingOver;
 function crosingOver()
 {
-    let sum = 0;
-    let Mas = [];
+    
     let firstParent, secondParent;
 
-    yArr.forEach((element, i) =>{
-        sum += (1 / element) * 10000000;
-        Mas[i] = sum;
-    });
-
+    let [sum, Mas] = yArr.reduce(
+        ([sum, Mas], element) => [sum + (1 / element) * 10000000, Mas.concat([sum + (1 / element) * 10000000])],
+        [0, []]
+    );
+    
     let newGeneration = []; let parents = []; COPoints = [];
     for(let i = 0; i < Math.floor(populationSize / 2); i++)
     {
