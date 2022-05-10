@@ -40,7 +40,6 @@ const choseParents = (copyMas, populationSize, sum) =>
 
     chance = Math.random() * sum;
     parent2 = idMas[copyMas.findIndex((value) => chance <= value)];
-    debugger
     return [parent1, parent2];
 }
 
@@ -88,17 +87,18 @@ function StartPopulation()
     }
 
     let outputTable = document.createElement("table");
+    outputTable.appendChild(document.createElement("tbody"));
     for(let i = 0; i < populationSize; i++)
     {
-        outputTable.appendChild(document.createElement("tr"));
+        outputTable.tBodies[0].appendChild(document.createElement("tr"));
         for(let j = 0; j < 5; j++)
         {
             outputTable.rows[i].appendChild(document.createElement("td"));
         }
-        outputTable.rows[i].cells[0].innerText = `${i+1}`;
-        outputTable.rows[i].cells[1].innerText = `${chromosomeArr[i]}`;
-        outputTable.rows[i].cells[2].innerText = `${xArr[i].toFixed(input_accuracy.value)}`;
-        outputTable.rows[i].cells[3].innerText = `${yArr[i].toFixed(input_accuracy.value)}`;
+        outputTable.tBodies[0].rows[i].cells[0].innerText = `${i+1}`;
+        outputTable.tBodies[0].rows[i].cells[1].innerText = `${chromosomeArr[i]}`;
+        outputTable.tBodies[0].rows[i].cells[2].innerText = `${xArr[i].toFixed(input_accuracy.value)}`;
+        outputTable.tBodies[0].rows[i].cells[3].innerText = `${yArr[i].toFixed(input_accuracy.value)}`;
     }
 
     outputTable.prepend(document.createElement("thead"));
@@ -144,7 +144,7 @@ function crosingOver()
         ([sum, Mas], element) => [sum + (1 / element) * 10000000, Mas.concat([sum + (1 / element) * 10000000])],
         [0, []]
     );
-    
+
     let newGeneration = []; let parents = []; COPoints = [];
     for(let i = 0; i < Math.floor(populationSize / 2); i++)
     {
@@ -166,7 +166,7 @@ function crosingOver()
 
     for(let i = 0; i < newGeneration.length; i++)
     {
-        let row = TableGlobal.appendChild(document.createElement("tr"));
+        let row = TableGlobal.tBodies[0].appendChild(document.createElement("tr"));
         for(let j = 0; j < 5; j++)
         {
             row.appendChild(document.createElement("td"));
@@ -184,7 +184,44 @@ function crosingOver()
 
 function mutation(newGeneration)
 {
+    let mutationChance = 0.05;
 
+    let mutatedNewGeneration = newGeneration.reduce((mas, element) => 
+        mas.concat([element
+            .split('')
+            .map((char) => (Math.random() < mutationChance) ? ((char === '0') ? '1' : '0') : char)
+            .join('')])
+    , []);
+    
+    let mutaions = mutatedNewGeneration.reduce((mas, element, i) =>
+        mas.concat([element
+            .split('')
+            .map((char, id) => [id, char])
+            .filter((char, id) => char[1] != newGeneration[i].split('')[id])])
+    ,[]);
+
+    mutatedNewGeneration.forEach((element, i) => {
+        chromosomeArr[populationSize + i] = element;
+        xArr[populationSize + i] = xFromChoromosome(element, chromosomeSize, xStart, xEnd);
+        yArr[populationSize + i] = y(xArr[populationSize + i]);
+    });
+    
+    for(let i = 0; i < newGeneration.length; i++)
+    {
+        TableGlobal.tBodies[0].rows[populationSize + i].cells[0].innerText = `${populationSize + i + 1}`;
+        TableGlobal.tBodies[0].rows[populationSize + i].cells[1].innerText = `${chromosomeArr[populationSize+i]}`;
+        TableGlobal.tBodies[0].rows[populationSize + i].cells[2].innerText = `${xArr[populationSize + i].toFixed(input_accuracy.value)}`;
+        TableGlobal.tBodies[0].rows[populationSize + i].cells[3].innerText = `${yArr[populationSize + i].toFixed(input_accuracy.value)}`;
+        TableGlobal.tBodies[0].rows[populationSize + i].cells[4].innerText += (mutaions[i].length != 0) ? ` М(${mutaions[i].map((elem) => elem[0] + 1).join()})` : '';
+    }   
+    iteration_header.innerHTML = `Итерация: ${iterationCount}<br>Мутация`;
+    populationSize += newGeneration.length;
+    step_forvard_button.onclick = selection();
+}
+
+function selection()
+{
+    
 }
 
 
