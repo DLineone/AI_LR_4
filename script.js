@@ -1,19 +1,38 @@
 
-let input_x_start = document.querySelector(".input-x-start");
-let input_x_end = document.querySelector(".input-x-end");
-let input_accuracy = document.querySelector(".input-accuracy");
-let input_population_size = document.querySelector(".input-population-size");
-let input_iteration_number = document.querySelector(".input-iteration-number");
-let output_chromosome_size = document.querySelector(".output-chromosome-size");
-let button_div = document.querySelector(".button-div");
-let result_content = document.querySelector(".result-content");
+const input_x_start = document.querySelector(".input-x-start");
+const input_x_end = document.querySelector(".input-x-end");
+const input_accuracy = document.querySelector(".input-accuracy");
+const input_population_size = document.querySelector(".input-population-size");
+const input_iteration_number = document.querySelector(".input-iteration-number");
+const output_chromosome_size = document.querySelector(".output-chromosome-size");
+const button_div = document.querySelector(".button-div");
+const iteration_header = document.querySelector(".iteration-header");
+const result_content = document.querySelector(".result-content");
 
-let submit_variables_button = document.querySelector(".submit-variables");
-let step_forvard_button = document.querySelector(".step-forvard-button");
-let result_btton = document.querySelector(".result-btton");
+const submit_variables_button = document.querySelector(".submit-variables");
+const step_forvard_button = document.querySelector(".step-forvard-button");
+const result_button = document.querySelector(".result-button");
 
-let xStart, xEnd, accuracy, populationSize, iterationNumber, chromosomeSize;
+let xStart, xEnd, accuracy, populationSize, iterationNumber, chromosomeSize, iterationCount, TableGlobal;
 let R, kol;
+let chromosomeArr = [], xArr = [], yArr = [];
+
+const y = (x) => ((x-155)**2 + 100);
+
+const xFromChoromosome = (chromosome, chromosomeSize, xStart, xEnd) =>
+{
+    let delta = (xEnd - xStart)/(2**chromosomeSize);
+    let x = xStart + delta * parseInt(chromosome, 2); 
+    return x;
+}
+
+const getRandom = (min, max) => Math.random() * (max - min) + min;
+
+const choseParents = (copyMas, populationSize, sum) =>
+{
+    let copyPopulationSize = populationSize;
+
+}
 
 submit_variables_button.onclick = initVariables;
 function initVariables()
@@ -22,6 +41,8 @@ function initVariables()
     xEnd = parseFloat(input_x_end.value);
     if(xStart > xEnd)
     {
+        button_div.style.visibility = "hidden";
+        iteration_header.style.visibility = "hidden";
         alert("Неверные данные! (начальное значение меньше конечного)");
         return;
     }
@@ -43,18 +64,89 @@ function initVariables()
 
 function StartPopulation()
 {
-    // let outputTable = document.createElement("table");
-    // for(let i = 0; i < 10; i++)
-    // {
-    //     outputTable.appendChild(document.createElement("tr"));
-    //     for(let j = 0; j < 10; j++)
-    //     {
-    //         outputTable.rows[i].appendChild(document.createElement("td"));
-    //         outputTable.rows[i].cells[j].innerText = `${i}  ${j}`;
-    //     }
-    // }
-    // outputTable = result_content.appendChild(outputTable);
-    // outputTable.rows[0].cells[0].innerText = "asdasfa";
+    chromosomeArr = []; xArr = []; yArr = [];
+    for(let i = 0; i < populationSize; i++)
+    {
+        let chromosome = "";
+        for(let j = 0; j < chromosomeSize; j++)
+        {   
+            chromosome += (Math.round(Math.random()) == 1) ? '1' : '0';
+        }
+        chromosomeArr[i] = chromosome;
+        xArr[i] = xFromChoromosome(chromosome, chromosomeSize, xStart, xEnd);
+        yArr[i] = y(xArr[i]); 
+    }
 
-    
+    let outputTable = document.createElement("table");
+    for(let i = 0; i < populationSize; i++)
+    {
+        outputTable.appendChild(document.createElement("tr"));
+        for(let j = 0; j < 5; j++)
+        {
+            outputTable.rows[i].appendChild(document.createElement("td"));
+        }
+        outputTable.rows[i].cells[0].innerText = `${i+1}`;
+        outputTable.rows[i].cells[1].innerText = `${chromosomeArr[i]}`;
+        outputTable.rows[i].cells[2].innerText = `${xArr[i].toFixed(input_accuracy.value)}`;
+        outputTable.rows[i].cells[3].innerText = `${yArr[i].toFixed(input_accuracy.value)}`;
+    }
+
+    result_content.removeChild(document.querySelector("table"));
+    TableGlobal = result_content.appendChild(outputTable);
+
+    iterationCount = 0;
+    iteration_header.innerText = "Итерация: 0";
+    button_div.style.visibility = "visible";
+    iteration_header.style.visibility = "visible";
 }
+
+step_forvard_button.onclick = stepForvard;
+function stepForvard()
+{
+    let sum = 0;
+    let Mas = [];
+    let firstParent, secondParent;
+
+    yArr.forEach((element, i) =>{
+        sum += (1 / element) * 10000000;
+        Mas[i] = sum;
+    });
+
+    let newGeneration = []; let parents = []; COPoints = [];
+    for(let i = 0; i < Math.floor(populationSize / 2); i++)
+    {
+        [firstParent, secondParent] = choseParents([...Mas], populationSize, sum);
+        let crossingOverPoint = Math.floor(getRandom(Math.floor(chromosomeSize / 2) - 2, Math.floor(chromosomeSize / 2) + 3));
+        let firstChild = chromosomeArr[firstParent].substring(0, crossingOverPoint) + chromosomeArr[secondParent].substring(crossingOverPoint);
+        let secondChild = chromosomeArr[secondParent].substring(0, crossingOverPoint) + chromosomeArr[firstParent].substring(crossingOverPoint);
+        COPoints.push(crossingOverPoint, crossingOverPoint);
+        parents.push([firstParent, secondParent]);
+        parents.push([secondParent, firstParent]);
+        newGeneration.push(firstChild, secondChild);
+    }
+
+    newGeneration.forEach((element) => {
+        chromosomeArr.push(element);
+        xArr.push(xFromChoromosome(chromosome, chromosomeSize, xStart, xEnd));
+        yArr.push(y(xArr[i]));
+    });
+
+    for(let i = 0; i < newGeneration.length; i++)
+    {
+        let row = TableGlobal.appendChild(document.createElement("tr"));
+        for(let j = 0; j < 5; j++)
+        {
+            row.appendChild(document.createElement("td"));
+            row.cells[0].innerText = `${i+1}`;
+            row.cells[1].innerText = `${chromosomeArr[populationSize-1+i]}`;
+            row.cells[2].innerText = `${xArr[populationSize-1+i].toFixed(input_accuracy.value)}`;
+            row.cells[3].innerText = `${yArr[populationSize-1+i].toFixed(input_accuracy.value)}`;
+            row.cells[4].innerText += `K ${parents[i][0]}+${parents[i][1]}in${COPoint[i]}`;
+        }
+    }
+    populationSize += newGeneration.length;
+}
+
+
+
+//find min value of a function

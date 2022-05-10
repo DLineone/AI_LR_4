@@ -12,11 +12,11 @@
     <div class="input-menu">
         <div class="input-div">
             <p>X начальное:</p>
-            <input type="number" class="input-x-start">
+            <input type="number" class="input-x-start" value="2" min="0" required>
         </div>
         <div class="input-div">
             <p>X конечное:</p>
-            <input type="number" class="input-x-end" required>
+            <input type="number" class="input-x-end" value="25" min="0" required>
         </div>
         <div class="input-div">
             <p>Порядок точности:</p>
@@ -24,11 +24,11 @@
         </div>
         <div class="input-div">
             <p>Размер популяции:</p>
-            <input type="number" class="input-population-size" required min="10" max="500" step="10">
+            <input type="number" class="input-population-size" value="10" required min="10" max="500" step="10">
         </div>
         <div class="input-div">
             <p>Кол-во итераций:</p>
-            <input type="number" class="input-iteration-number" required min="10" max="500" step="10">
+            <input type="number" class="input-iteration-number" value="50" required min="10" max="500" step="10">
         </div>
         <div class="input-div">
             <p>Размер хромосомы:</p>
@@ -39,13 +39,14 @@
         </div>
         <div class="input-div button-div" style="visibility: hidden;">
             <button class="step-forvard-button">Сделать шаг</button>
-            <button class="result-btton">Показать результат</button>
+            <button class="result-button">Показать результат</button>
         </div>
     </div>
     <div class="result">
         <p class="result-header">Результат</p>
+        <p class="iteration-header" style="visibility: hidden;">Итерация: 0</p>
         <div class="result-content">
-
+            <table></table>
         </div>
     </div>
 
