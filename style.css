@@ -94,7 +94,6 @@ button:active
 {
     height: 90%;
     width: 98%;
-    margin-top: 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -103,4 +102,19 @@ button:active
 td
 {
     border: 2px solid black;
+}
+
+thead>tr:nth-child(2)>td
+{
+    border: 2px solid red;
+}
+
+thead>tr:nth-child(1)>td
+{
+    text-align: center;
+}
+
+.iteration-header
+{
+    text-align: center;
 }

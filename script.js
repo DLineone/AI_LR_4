@@ -31,7 +31,29 @@ const getRandom = (min, max) => Math.random() * (max - min) + min;
 const choseParents = (copyMas, populationSize, sum) =>
 {
     let copyPopulationSize = populationSize;
-
+    let parent1, parent2;
+    copyMas = copyMas.map((value, index) => [index, value]);
+    let chance = Math.random() * sum;
+    for(let i = 0; i < copyPopulationSize; i++)
+    {
+        if(chance <= copyMas[i][1])
+        {
+            parent1 = copyMas[i][0];
+            copyMas.splice(i, 1);
+            copyPopulationSize--;
+            break;
+        }
+    }
+    chance = Math.random() * sum;
+    for(let i = 0; i < copyPopulationSize; i++)
+    {
+        if(chance <= copyMas[i][1])
+        {
+            parent2 = copyMas[i][0];
+            break;
+        }
+    }
+    return [parent1, parent2];
 }
 
 submit_variables_button.onclick = initVariables;
@@ -91,17 +113,41 @@ function StartPopulation()
         outputTable.rows[i].cells[3].innerText = `${yArr[i].toFixed(input_accuracy.value)}`;
     }
 
+    outputTable.prepend(document.createElement("thead"));
+    outputTable.tHead.appendChild(document.createElement("tr"));
+    outputTable.tHead.appendChild(document.createElement("tr"));
+    for(let i = 0; i < 2; i++)
+    {
+        for(let j = 0; j < 5; j++)
+        {
+            outputTable.tHead.rows[i].appendChild(document.createElement("td"));
+        }
+    }
+
+    outputTable.tHead.rows[0].cells[0].innerText = "№";
+    outputTable.tHead.rows[0].cells[1].innerText = "Хромосома";
+    outputTable.tHead.rows[0].cells[2].innerText = "X";
+    outputTable.tHead.rows[0].cells[3].innerText = "Y";
+    outputTable.tHead.rows[0].cells[4].innerText = "Модификация";
+
+    let bestChromosome = yArr.reduce((minIndex, value, index) => (yArr[minIndex] > value) ? index : minIndex, 0);
+
+    outputTable.tHead.rows[1].cells[0].innerText = `${bestChromosome + 1}`;
+    outputTable.tHead.rows[1].cells[1].innerText = `${chromosomeArr[bestChromosome]}`;
+    outputTable.tHead.rows[1].cells[2].innerText = `${xArr[bestChromosome].toFixed(input_accuracy.value)}`;
+    outputTable.tHead.rows[1].cells[3].innerText = `${yArr[bestChromosome].toFixed(input_accuracy.value)}`;
+
     result_content.removeChild(document.querySelector("table"));
     TableGlobal = result_content.appendChild(outputTable);
 
     iterationCount = 0;
-    iteration_header.innerText = "Итерация: 0";
+    iteration_header.innerHTML = "Итерация: 0<br>Новое поколение";
     button_div.style.visibility = "visible";
     iteration_header.style.visibility = "visible";
 }
 
-step_forvard_button.onclick = stepForvard;
-function stepForvard()
+step_forvard_button.onclick = crosingOver;
+function crosingOver()
 {
     let sum = 0;
     let Mas = [];
@@ -127,8 +173,8 @@ function stepForvard()
 
     newGeneration.forEach((element) => {
         chromosomeArr.push(element);
-        xArr.push(xFromChoromosome(chromosome, chromosomeSize, xStart, xEnd));
-        yArr.push(y(xArr[i]));
+        xArr.push(xFromChoromosome(element, chromosomeSize, xStart, xEnd));
+        yArr.push(y(xArr.slice(-1)));
     });
 
     for(let i = 0; i < newGeneration.length; i++)
@@ -137,16 +183,22 @@ function stepForvard()
         for(let j = 0; j < 5; j++)
         {
             row.appendChild(document.createElement("td"));
-            row.cells[0].innerText = `${i+1}`;
-            row.cells[1].innerText = `${chromosomeArr[populationSize-1+i]}`;
-            row.cells[2].innerText = `${xArr[populationSize-1+i].toFixed(input_accuracy.value)}`;
-            row.cells[3].innerText = `${yArr[populationSize-1+i].toFixed(input_accuracy.value)}`;
-            row.cells[4].innerText += `K ${parents[i][0]}+${parents[i][1]}in${COPoint[i]}`;
         }
+        row.cells[0].innerText = `${populationSize + i + 1}`;
+        row.cells[1].innerText = `${chromosomeArr[populationSize+i]}`;
+        row.cells[2].innerText = `${xArr[populationSize + i].toFixed(input_accuracy.value)}`;
+        row.cells[3].innerText = `${yArr[populationSize + i].toFixed(input_accuracy.value)}`;
+        row.cells[4].innerText += `K(${parents[i][0] + 1}+${parents[i][1] + 1}in${COPoints[i]})`;
     }
-    populationSize += newGeneration.length;
+    iteration_header.innerHTML = `Итерация: ${iterationCount}<br>Кросинговер`;
+
+    step_forvard_button.onclick = () => {mutation(newGeneration)};
 }
 
+function mutation(newGeneration)
+{
+
+}
 
 
 //find min value of a function
