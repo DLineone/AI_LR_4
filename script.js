@@ -300,8 +300,5 @@ function resultFunc()
         }, 1000)
         
     }
-    setTimeout(() => {
-        iteration_header.innerHTML = `Итерация: ${iterationNumber}<br>Селекция<br>Новое Поколение`;
-    }, 1000 * iterationNumber)
 }
 //find min value of a function
