@@ -13,7 +13,7 @@ const submit_variables_button = document.querySelector(".submit-variables");
 const step_forvard_button = document.querySelector(".step-forvard-button");
 const result_button = document.querySelector(".result-button");
 
-let xStart, xEnd, accuracy, populationSize, iterationNumber, chromosomeSize, iterationCount, TableGlobal;
+let xStart, xEnd, accuracy, populationSize, iterationNumber, chromosomeSize, iterationCount, TableGlobal, previousPopulationSize, newGeneration = [];
 let R, kol;
 let chromosomeArr = [], xArr = [], yArr = [];
 
@@ -145,7 +145,7 @@ function crosingOver()
         [0, []]
     );
 
-    let newGeneration = []; let parents = []; COPoints = [];
+    newGeneration = []; let parents = []; COPoints = [];
     for(let i = 0; i < Math.floor(populationSize / 2); i++)
     {
         [firstParent, secondParent] = choseParents([...Mas], populationSize, sum);
@@ -179,10 +179,10 @@ function crosingOver()
     }
     iteration_header.innerHTML = `Итерация: ${iterationCount}<br>Кросинговер`;
 
-    step_forvard_button.onclick = () => {mutation(newGeneration)};
+    step_forvard_button.onclick = mutation;
 }
 
-function mutation(newGeneration)
+function mutation()
 {
     let mutationChance = 0.05;
 
@@ -215,14 +215,93 @@ function mutation(newGeneration)
         TableGlobal.tBodies[0].rows[populationSize + i].cells[4].innerText += (mutaions[i].length != 0) ? ` М(${mutaions[i].map((elem) => elem[0] + 1).join()})` : '';
     }   
     iteration_header.innerHTML = `Итерация: ${iterationCount}<br>Мутация`;
+    previousPopulationSize = populationSize;
     populationSize += newGeneration.length;
-    step_forvard_button.onclick = selection();
+    step_forvard_button.onclick = selection;
 }
 
 function selection()
 {
-    
+    let newPopulation = [];
+    for(let i = 0; i < previousPopulationSize; i++)
+    {
+        newPopulation[i] = yArr.reduce((min, element, id) => 
+            (element < yArr[min]) ? id : min
+        , 0);
+        yArr.splice(newPopulation[i], 1);
+        xArr.splice(newPopulation[i], 1);
+        newPopulation[i] = chromosomeArr.splice(newPopulation[i], 1).join('');
+    }
+    chromosomeArr = [...newPopulation];
+    xArr = chromosomeArr.reduce((mas, elem) => mas.concat(xFromChoromosome(elem, chromosomeSize, xStart, xEnd)), []);
+    yArr = xArr.reduce((mas, elem) => mas.concat(y(elem)), []);
+
+    iteration_header.innerHTML = `Итерация: ${iterationCount}<br>Селекция<br>Новое Поколение`;
+    populationSize = previousPopulationSize;
+    iterationCount++;
+
+    let outputTable = document.createElement("table");
+    outputTable.appendChild(document.createElement("tbody"));
+    for(let i = 0; i < populationSize; i++)
+    {
+        outputTable.tBodies[0].appendChild(document.createElement("tr"));
+        for(let j = 0; j < 5; j++)
+        {
+            outputTable.rows[i].appendChild(document.createElement("td"));
+        }
+        outputTable.tBodies[0].rows[i].cells[0].innerText = `${i+1}`;
+        outputTable.tBodies[0].rows[i].cells[1].innerText = `${chromosomeArr[i]}`;
+        outputTable.tBodies[0].rows[i].cells[2].innerText = `${xArr[i].toFixed(input_accuracy.value)}`;
+        outputTable.tBodies[0].rows[i].cells[3].innerText = `${yArr[i].toFixed(input_accuracy.value)}`;
+    }
+
+    outputTable.prepend(document.createElement("thead"));
+    outputTable.tHead.appendChild(document.createElement("tr"));
+    outputTable.tHead.appendChild(document.createElement("tr"));
+    for(let i = 0; i < 2; i++)
+    {
+        for(let j = 0; j < 5; j++)
+        {
+            outputTable.tHead.rows[i].appendChild(document.createElement("td"));
+        }
+    }
+
+    outputTable.tHead.rows[0].cells[0].innerText = "№";
+    outputTable.tHead.rows[0].cells[1].innerText = "Хромосома";
+    outputTable.tHead.rows[0].cells[2].innerText = "X";
+    outputTable.tHead.rows[0].cells[3].innerText = "Y";
+    outputTable.tHead.rows[0].cells[4].innerText = "Модификация";
+
+    let bestChromosome = yArr.reduce((minIndex, value, index) => (yArr[minIndex] > value) ? index : minIndex, 0);
+
+    outputTable.tHead.rows[1].cells[0].innerText = `${bestChromosome + 1}`;
+    outputTable.tHead.rows[1].cells[1].innerText = `${chromosomeArr[bestChromosome]}`;
+    outputTable.tHead.rows[1].cells[2].innerText = `${xArr[bestChromosome].toFixed(input_accuracy.value)}`;
+    outputTable.tHead.rows[1].cells[3].innerText = `${yArr[bestChromosome].toFixed(input_accuracy.value)}`;
+
+    result_content.removeChild(document.querySelector("table"));
+    TableGlobal = result_content.appendChild(outputTable);
+
+    step_forvard_button.onclick = crosingOver;
 }
 
-
+result_button.onclick = resultFunc;
+function resultFunc()
+{
+    initVariables();
+    StartPopulation();
+    for(let i = 0; i < iterationNumber; i++)
+    {
+        setTimeout(() => {
+            iterationCount = i;
+            crosingOver();
+            mutation();
+            selection();
+        }, 1000)
+        
+    }
+    setTimeout(() => {
+        iteration_header.innerHTML = `Итерация: ${iterationNumber}<br>Селекция<br>Новое Поколение`;
+    }, 1000 * iterationNumber)
+}
 //find min value of a function
