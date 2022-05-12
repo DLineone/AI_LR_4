@@ -38,8 +38,15 @@ const choseParents = (copyMas, populationSize, sum) =>
     copyMas.splice(parent1, 1);
     idMas.splice(parent1, 1);
 
-    chance = Math.random() * sum;
-    parent2 = idMas[copyMas.findIndex((value) => chance <= value)];
+    if(parent1 == 9)
+    {
+        sum = copyMas.slice(-1);    
+    }
+
+    let chance2 = Math.random() * sum;
+    parent2 = idMas[copyMas.findIndex((value) => chance2 <= value)];
+
+    
     return [parent1, parent2];
 }
 
@@ -150,8 +157,9 @@ function crosingOver()
     {
         [firstParent, secondParent] = choseParents([...Mas], populationSize, sum);
         let crossingOverPoint = Math.floor(getRandom(Math.floor(chromosomeSize / 2) - 2, Math.floor(chromosomeSize / 2) + 3));
-        let firstChild = chromosomeArr[firstParent].substring(0, crossingOverPoint) + chromosomeArr[secondParent].substring(crossingOverPoint);
+        let firstChild  = chromosomeArr[firstParent].substring(0, crossingOverPoint) + chromosomeArr[secondParent].substring(crossingOverPoint);
         let secondChild = chromosomeArr[secondParent].substring(0, crossingOverPoint) + chromosomeArr[firstParent].substring(crossingOverPoint);
+            
         COPoints.push(crossingOverPoint, crossingOverPoint);
         parents.push([firstParent, secondParent]);
         parents.push([secondParent, firstParent]);
@@ -292,13 +300,10 @@ function resultFunc()
     StartPopulation();
     for(let i = 0; i < iterationNumber; i++)
     {
-        setTimeout(() => {
-            iterationCount = i;
-            crosingOver();
-            mutation();
-            selection();
-        }, 1000)
-        
+        iterationCount = i;
+        crosingOver();
+        mutation();
+        selection();
     }
 }
 //find min value of a function
